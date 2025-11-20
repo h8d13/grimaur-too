@@ -40,8 +40,9 @@
 - `grimaur remove <package>` to uninstall from pacman
    - Pass `--remove-cache` to delete cached files too
 
-### Stay Updated
+### Stay Updated`
 - `grimaur update` rebuilds every installed “foreign” package that has a newer release.
+   - Pass `--global` to update system first, then AUR packages
 - `grimaur update <pkg1> <pkg2>` limits the update run to specific packages.
 - `grimaur update --devel` Update all *-git packages aswell (needed for grimaur-git for example).
 - Combine with `--refresh` to force a fresh pull of every tracked package.
