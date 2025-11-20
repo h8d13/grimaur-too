@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#!/usr/bin/env python3
 """grimaur: Fetch, inspect, search, update, and install Arch Linux AUR packages.
 
 By default this tool queries the official AUR RPC API and automatically falls back to
@@ -808,6 +809,20 @@ def get_installed_version(package: str) -> Optional[str]:
     return None
 
 
+def list_installed_packages() -> None:
+    """List all installed foreign (AUR) packages."""
+    foreign = list_foreign_packages()
+    
+    if not foreign:
+        print("No foreign packages installed")
+        return
+    
+    print(style(f"Installed foreign packages ({len(foreign)}):", CYAN))
+    
+    for name in sorted(foreign.keys()):
+        version = foreign[name]
+        print(f"  {style(name, BOLD)} {style(version, GREEN)}")
+
 def fetch_git_file(package: str, path: str) -> Optional[str]:
     safe_package = urllib.parse.quote(package)
     safe_path = path.lstrip("/")
@@ -836,13 +851,16 @@ def git_srcinfo_metadata(package: str) -> Optional[tuple[str, Optional[str]]]:
         version = info.get("Version")
         description = info.get("Description")
         if isinstance(version, str) or isinstance(description, str):
-            return (version if isinstance(version, str) else None, description if isinstance(description, str) else None)
+            version_result = version if isinstance(version, str) else None
+            description_result = description if isinstance(description, str) else None
+            if version_result is not None:  # Only return if version is valid
+                return (version_result, description_result)
         # fallback to raw .SRCINFO if fields missing
     srcinfo = fetch_git_file(package, ".SRCINFO")
     if not srcinfo:
         return None
     version, description = _parse_srcinfo_metadata(srcinfo)
-    if not version and not description:
+    if not version:  # Changed: only check version since it's required
         return None
     return version, description
 
@@ -1026,6 +1044,35 @@ def install_package(
 
     build_and_install(package_dir, noconfirm=noconfirm)
 
+def get_ignored_packages() -> Set[str]:
+    """Read IgnorePkg entries from pacman.conf."""
+    ignored: Set[str] = set()
+    pacman_conf = Path("/etc/pacman.conf")
+    
+    if not pacman_conf.exists():
+        return ignored
+    
+    try:
+        content = pacman_conf.read_text()
+    except (OSError, PermissionError):
+        return ignored
+    
+    for line in content.splitlines():
+        line = line.strip()
+        
+        # Skip comments and empty lines
+        if not line or line.startswith("#"):
+            continue
+        
+        # Look for IgnorePkg lines
+        if line.startswith("IgnorePkg"):
+            # Format: IgnorePkg = pkg1 pkg2 pkg3
+            if "=" in line:
+                _, packages = line.split("=", 1)
+                for pkg in packages.split():
+                    ignored.add(pkg.strip())
+    
+    return ignored
 
 def update_packages(
     dest_root: Path,
@@ -1035,6 +1082,8 @@ def update_packages(
     include_devel: bool,
     targets: Optional[Sequence[str]] = None,
 ) -> None:
+    ignored = get_ignored_packages()
+
     candidates: List[tuple[str, Optional[str]]]
     if targets:
         seen: Set[str] = set()
@@ -1057,6 +1106,10 @@ def update_packages(
 
     for package, installed_version in candidates:
         if is_debug_package(package):
+            continue
+        # Skip ignored packages
+        if package in ignored:
+            print(f"Skipping {package} (in IgnorePkg)", file=sys.stderr)
             continue
         if skip_devel and is_vcs_package(package):
             continue
@@ -1659,13 +1712,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Include make/check/optional dependencies when showing info",
     )
+    subparsers.add_parser("list", help="List installed foreign (AUR) packages")
 
     return parser
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
     argv_list = list(argv if argv is not None else sys.argv[1:])
-    commands = {"fetch", "install", "update", "search", "inspect", "complete"}
+    commands = {"fetch", "install", "update", "search", "inspect", "complete", "list"}
     if argv_list and not argv_list[0].startswith("-") and argv_list[0] not in commands:
         reordered: List[str] = []
         remaining: List[str] = []
@@ -1821,6 +1875,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 target="PKGBUILD" if args.target == "PKGBUILD" else ("SRCINFO" if args.target == "SRCINFO" else "info"),
                 show_deps=args.show_build_deps,
             )
+        elif args.command == "list":
+            list_installed_packages()
         else:
             parser.error("Unknown command")
     except AurGitError as exc:
@@ -1831,4 +1887,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except KeyboardInterrupt:
+        print("\n" + style("Interrupted by user", YELLOW), file=sys.stderr)
+        sys.exit(130)
