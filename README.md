@@ -29,7 +29,7 @@
 
 ## Search Packages
 - `grimaur <term>` (or `grimaur search <term>`) lists matching packages and lets you pick one to install.
-- `grimaur list` to see "foreign" packages recognized by pacman
+- `grimaur list` to see installed "foreign" packages recognized by pacman
 
 ## Install Packages
 - `grimaur install <package>` clones the repo, resolves dependencies, builds with `makepkg`
