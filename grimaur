@@ -1057,11 +1057,8 @@ def get_ignored_packages() -> Set[str]:
     
     if not pacman_conf.exists():
         return ignored
-    
-    try:
-        content = pacman_conf.read_text()
-    except (OSError, PermissionError):
-        return ignored
+
+    content = pacman_conf.read_text()
     
     for line in content.splitlines():
         line = line.strip()
