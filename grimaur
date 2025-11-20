@@ -961,6 +961,13 @@ def install_package(
         return
     visited.add(package)
 
+    if is_installed(package):
+        installed_ver = get_installed_version(package)
+        print(f"Package {style(package, BOLD)} is already installed ({installed_ver})")
+        if not noconfirm and not prompt_confirm(style("Reinstall? [y/N]: ", YELLOW)):
+            print("Cancelled installation.")
+            return
+
     if preinstalled_official is None:
         preinstalled_official = set()
 
