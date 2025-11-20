@@ -20,6 +20,7 @@
 
 ## Search Packages
 - `grimaur <term>` (or `grimaur search <term>`) lists matching packages and lets you pick one to install.
+- `grimaur list` to see "foreign" packages recognized by pacman
 
 ## Install Packages
 - `grimaur install <package>` clones the repo, resolves dependencies, builds with `makepkg`, and installs via `pacman` when needed.
@@ -30,3 +31,4 @@
 - `grimaur update <pkg1> <pkg2>` limits the update run to specific packages.
 - `grimaur update --devel` Update all *-git packages aswell (needed for grimaur-git for example).
 - Combine with `--refresh` to force a fresh pull of every tracked package.
+- New respects `IgnorePkg = x y z` from `/etc/pacman.conf`
