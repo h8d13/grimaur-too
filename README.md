@@ -1,6 +1,9 @@
 # grimaur
 
-`grimaur` is a lightweight AUR helper that searches, builds, and updates AUR packages. It talks to the AUR RPC API by default and automatically falls back to the official git mirror when the endpoint is unavailable. When the AUR is down, run commands with `--git-mirror` (for example `grimaur <package> --git-mirror`) to bypass the RPC entirely.
+`grimaur` is a lightweight AUR helper that searches, builds, and updates AUR packages. It talks to the AUR RPC API by default and automatically falls back to the official git mirror when the endpoint is unavailable. 
+
+>![NOTE]
+>When the AUR is down, run commands with `--git-mirror` (for example `grimaur <package> --git-mirror`) to bypass the RPC entirely.
 
 ## Install
 ### Directly from the AUR
@@ -16,7 +19,12 @@
    cd grimaur-git
    makepkg -si
    ```
-   
+### From Python directly
+   ```bash
+   git clone https://github.com/ryk4rd/grimaur
+   cd grimaur
+   python grimaur <command>
+   ```
 
 ## Search Packages
 - `grimaur <term>` (or `grimaur search <term>`) lists matching packages and lets you pick one to install.
