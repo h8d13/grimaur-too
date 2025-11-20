@@ -1,3 +1,6 @@
+# Bash completion for grimaur helper
+# Source this file or place it in bash_completion.d to enable `grimaur` completions.
+
 _grimaur_completion()
 {
     local cur prev words cword
