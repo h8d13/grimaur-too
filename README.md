@@ -61,6 +61,5 @@ Even see it directly: `python grimaur inspect brave-bin --target PKGBUILD` Also 
    - `grimaur search <term> --limit 10` limits results to the first N matches 
    - `grimaur search <term> --no-interactive` lists results without prompting to install
 - Force `grimaur fetch <package> --force` reclones even if the directory exists
-
-- Example advanced git search: `python grimaur --git-mirror search "brave-.*-bin" --regex --no-interactive`
+- Regex matcher: `python grimaur --git-mirror search "brave-.*-bin" --regex --no-interactive`
 
