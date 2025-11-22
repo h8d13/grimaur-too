@@ -52,7 +52,7 @@ _RPC_FALLBACK_NOTIFIED = False
 
 _COMMON_AUR_SUFFIXES = ("-bin",)
 
-_GLOBAL_FLAG_OPTIONS = {"--refresh", "--no-color", "--aur-rpc", "--git-mirror", "--no-build"}
+_GLOBAL_FLAG_OPTIONS = {"--refresh", "--no-color", "--aur-rpc", "--git-mirror"}
 _GLOBAL_VALUE_OPTIONS = {"--dest-root"}
 
 
