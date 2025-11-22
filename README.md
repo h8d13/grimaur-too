@@ -30,7 +30,12 @@
 ## Usage
 ### Search Packages
 - `grimaur <term>` (or `grimaur search <term>`) lists matching packages and lets you pick one to install.
-- `grimaur list` to see installed "foreign" packages recognized by pacman
+- `grimaur list` to see installed "foreign" packages recognized by pacman -Qm
+
+>[!NOTE]
+> You can use `grimaur fetch <package>` to inspect `PKGBUILD` and source code before manually installing using `makepkg` or similar.
+> Or even see it directly: `python grimaur inspect brave-bin --target PKGBUILD` Also accepts: `SRCINFO`
+> Force `grimaur fetch <package> --force` reclones even if the directory exists
 
 ### Inspect & Install & Remove Packages
 - `grimaur inspect <package> --full` Shows full depends
@@ -40,10 +45,25 @@
 - `grimaur remove <package>` to uninstall from pacman
    - Pass `--remove-cache` to delete cached files too
 
-### Stay Updated`
+### Stay Updated
 - `grimaur update` rebuilds every installed “foreign” package that has a newer release.
    - Pass `--global` to update system first, then AUR packages
 - `grimaur update <pkg1> <pkg2>` limits the update run to specific packages.
 - `grimaur update --devel` Update all *-git packages aswell (needed for grimaur-git for example).
 - Combine with `--refresh` to force a fresh pull of every tracked package.
-- New respects `IgnorePkg = x y z` from `/etc/pacman.conf`
+- Respects `IgnorePkg = x y z` from `/etc/pacman.conf`
+
+### Additional Options
+
+- Useful for scripting on top of Grimaur
+   - `--no-color` disables colored terminal output 
+   - `grimaur search <term> --limit 10` limits results to the first N matches 
+   - `grimaur search <term> --no-interactive` lists results without prompting to install
+
+- Example advanced git search: `python grimaur --git-mirror search "brave-.*-bin" --regex --no-interactive`
+
+---
+
+### Generally:
+
+grimaur <global flags> term <options>
