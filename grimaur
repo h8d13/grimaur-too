@@ -1136,17 +1136,20 @@ def update_packages(
     targets: Sequence[str] | None = None,
     index_only: bool = False,
     download_only: bool = False,
+    install_only: bool = False,
     system_only: bool = False,
 ) -> None:
     ignored = get_ignored_packages()
 
     if update_system:
-        if index_only:
-            cmd: list[str] = ["pacman", "-Sy"]
-        elif download_only:
-            cmd = ["pacman", "-Syuw"]
+        if install_only:
+            cmd: list[str] = ["pacman", "-Su"]
         else:
-            cmd = ["pacman", "-Syu"]
+            cmd = ["pacman", "-Sy"]
+            if download_only:
+                cmd[1] += "uw"
+            elif not index_only:
+                cmd[1] += "u"
 
         if noconfirm:
             cmd.append("--noconfirm")
@@ -1790,6 +1793,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="With --global, download updates without installing (pacman -Syuw)",
     )
+    global_group.add_argument(
+        "--install",
+        action="store_true",
+        help="With --global, install already-downloaded packages (pacman -Su)",
+    )
     search_parser = subparsers.add_parser("search", help="Search packages via the configured backend")
     search_parser.add_argument("pattern", help="Substring or regex to match against package names")
     search_parser.add_argument("--regex", action="store_true", help="Treat the pattern as a regular expression")
@@ -1921,6 +1929,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 system_only=bool(getattr(args, "system_only", False)),
                 index_only=bool(getattr(args, "index", False)),
                 download_only=bool(getattr(args, "download", False)),
+                install_only=bool(getattr(args, "install", False)),
             )
         elif args.command == "search":
             regex_obj: re.Pattern | None = None
