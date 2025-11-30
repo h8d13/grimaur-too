@@ -8,7 +8,7 @@ recursively resolve and install dependencies by building packages locally with
 makepkg. Official repository dependencies are installed with pacman when they are
 missing.
 
-## /* SPDX-FileCopyrightText: 2025 
+## /* SPDX-FileCopyrightText: 2025
 # (O) Marcus A. <placeholder@placeholder.com>
 # (C) Eihdran L. <hadean-eon-dev@proton.me>
 
@@ -749,7 +749,7 @@ def list_foreign_packages() -> dict[str, str]:
         output = run_command(["pacman", "-Qm"], capture=True, check=False)
     except AurGitError:
         return {}
-    
+
     names: dict[str, str] = {}
     for line in str(output).splitlines():
         if not line.strip():
@@ -822,13 +822,13 @@ def get_installed_version(package: str) -> str | None:
 def list_installed_packages() -> None:
     """List all installed foreign (AUR) packages."""
     foreign = list_foreign_packages()
-    
+
     if not foreign:
         print("No foreign packages installed")
         return
-    
+
     print(style(f"Installed foreign packages ({len(foreign)}):", CYAN))
-    
+
     for name in sorted(foreign.keys()):
         version = foreign[name]
         print(f"  {style(name, BOLD)} {style(version, GREEN)}")
@@ -1072,15 +1072,15 @@ def remove_package(
     if not is_installed(package):
         print(f"Package {style(package, BOLD)} is not installed")
         return
-    
+
     # Remove with pacman -Rns
     cmd: list[str] = ["pacman", "-Rns", package]
     if noconfirm:
         cmd.append("--noconfirm")
-    
+
     if os.geteuid() != 0:
         cmd.insert(0, "sudo")
-    
+
     print(f"Removing package {style(package, BOLD)}")
     try:
         run_command(cmd)
@@ -1089,7 +1089,7 @@ def remove_package(
     except AurGitError as exc:
         print(f"Failed to remove package: {exc}", file=sys.stderr)
         return
-    
+
     # Optionally remove cached directory
     if remove_cache:
         package_dir = dest_root / package
@@ -1103,19 +1103,19 @@ def remove_package(
 def get_ignored_packages() -> set[str]:
     ignored: set[str] = set()
     pacman_conf = Path("/etc/pacman.conf")
-    
+
     if not pacman_conf.exists():
         return ignored
 
     content = pacman_conf.read_text()
-    
+
     for line in content.splitlines():
         line = line.strip()
-        
+
         # Skip comments and empty lines
         if not line or line.startswith("#"):
             continue
-        
+
         # Look for IgnorePkg lines
         if line.startswith("IgnorePkg"):
             # Format: IgnorePkg = pkg1 pkg2 pkg3
@@ -1123,7 +1123,7 @@ def get_ignored_packages() -> set[str]:
                 _, packages = line.split("=", 1)
                 for pkg in packages.split():
                     ignored.add(pkg.strip())
-    
+
     return ignored
 
 def update_packages(
